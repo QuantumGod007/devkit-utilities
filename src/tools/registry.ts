@@ -5,4 +5,5 @@ import { passwordTool } from './password.ts';
 import { uuidTool } from './uuid.ts';
 import { timestampTool } from './timestamp.ts';
 import { urlTool } from './url.ts';
-export const tools:Tool[]=[jsonTool,base64Tool,passwordTool,uuidTool,timestampTool,urlTool];
+import { caseTool } from './case.ts';
+export const tools:Tool[]=[jsonTool,base64Tool,passwordTool,uuidTool,timestampTool,urlTool,caseTool];
