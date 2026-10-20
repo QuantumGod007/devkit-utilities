@@ -1,0 +1,3 @@
+import type { Tool } from '../types.ts';
+export function count(value:string){const segments=new Intl.Segmenter(undefined,{granularity:'word'}).segment(value);return JSON.stringify({words:Array.from(segments).filter(part=>part.isWordLike).length,characters:Array.from(value).length,charactersWithoutWhitespace:Array.from(value.replace(/\s/gu,'')).length,lines:value?value.split(/\r\n|\r|\n/).length:0,utf8Bytes:new TextEncoder().encode(value).length},null,2)}
+export const counterTool:Tool={id:"counter",name:"Text inspector",category:"Text",description:"Count Unicode characters, words, lines, and UTF-8 bytes. Spaces count as characters.",sample:"Small tools. More flow.",actions:[{label:"Count text",run:count}]};
