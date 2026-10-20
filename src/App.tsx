@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { copyText } from './clipboard';
 import { tools } from './tools/registry';
 import type { Tool } from './types';
 
@@ -6,11 +7,14 @@ function ToolPanel({ tool }: { tool: Tool }) {
   const [input, setInput] = useState(tool.sample);
   const [output, setOutput] = useState('');
   const [error, setError] = useState('');
+  const [copyStatus, setCopyStatus] = useState('');
+  const [copying, setCopying] = useState(false);
   return <section className="workbench" aria-labelledby="tool-title">
     <div className="panel-heading"><div><span className="eyebrow">{tool.category}</span><h2 id="tool-title">{tool.name}</h2><p>{tool.description}</p></div><span className="local-badge">● Runs locally</span></div>
     <div className="editor-grid"><div className="editor"><div className="editor-label"><label htmlFor="tool-input">{tool.inputLabel || 'Input'}</label><button onClick={() => { setInput(tool.sample); setError(''); }}>Load example</button></div><textarea id="tool-input" value={input} onChange={event => setInput(event.target.value)} spellCheck={false} autoCapitalize="off" aria-describedby={error ? 'tool-error' : undefined} /></div>
-    <div className="editor"><div className="editor-label"><label htmlFor="tool-output">Output</label></div><textarea id="tool-output" value={output} readOnly placeholder="Your result will appear here." spellCheck={false} /></div></div>
-    <div className="actions">{tool.actions.map(action => <button className="primary" key={action.label} onClick={() => { try { setOutput(action.run(input)); setError(''); } catch (failure) { setOutput(''); setError(failure instanceof Error ? failure.message : 'Something went wrong. Please try again.'); } }}>{action.label}<span aria-hidden="true">↗</span></button>)}</div>
+    <div className="editor"><div className="editor-label"><label htmlFor="tool-output">Output</label><button disabled={!output || copying} onClick={async()=>{setCopying(true);setCopyStatus('');try{await copyText(output);setCopyStatus('Copied to clipboard.')}catch(error){setCopyStatus(error instanceof Error ? error.message : 'Copy failed.')}finally{setCopying(false)}}}>{copying ? 'Copying…' : 'Copy output'}</button></div><textarea id="tool-output" value={output} readOnly placeholder="Your result will appear here." spellCheck={false} /></div></div>
+    <div className="actions">{tool.actions.map(action => <button className="primary" key={action.label} onClick={() => { try { setCopyStatus(''); setOutput(action.run(input)); setError(''); } catch (failure) { setOutput(''); setError(failure instanceof Error ? failure.message : 'Something went wrong. Please try again.'); } }}>{action.label}<span aria-hidden="true">↗</span></button>)}</div>
+    <p className="copy-status" role="status" aria-live="polite">{copyStatus}</p>
     {error && <p id="tool-error" className="error" role="alert">{error}</p>}
     <div className="panel-footer"><span>PRIVATE BY DESIGN</span><p>Your input stays on this device. No uploads. No accounts.</p></div>
   </section>;

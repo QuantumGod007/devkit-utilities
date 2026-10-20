@@ -1,0 +1,1 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {copyText} from '../clipboard.ts';test('clipboard reports empty output and unavailable permission',async()=>{await assert.rejects(copyText(''),/Generate/);await assert.rejects(copyText('hello'),/HTTPS|permission/)});
