@@ -3,6 +3,10 @@ export function generate(value: string) {
   const count = /^\d+$/.test(value.trim()) ? Number(value) : NaN;
   if (!Number.isInteger(count) || count < 1 || count > 100)
     throw new Error("Enter a whole number from 1 to 100.");
+  if (typeof globalThis.crypto?.randomUUID !== "function")
+    throw new Error(
+      "UUID generation requires HTTPS or localhost and a browser with Web Crypto.",
+    );
   return Array.from({ length: count }, () => crypto.randomUUID()).join("\n");
 }
 export const uuidTool: Tool = {

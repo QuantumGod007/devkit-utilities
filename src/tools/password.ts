@@ -17,6 +17,10 @@ export function generate(value: string) {
   const length = /^\d+$/.test(value.trim()) ? Number(value) : NaN;
   if (!Number.isInteger(length) || length < 8 || length > 128)
     throw new Error("Length must be a whole number between 8 and 128.");
+  if (typeof globalThis.crypto?.getRandomValues !== "function")
+    throw new Error(
+      "Secure password generation is unavailable in this browser. Use a browser with Web Crypto.",
+    );
   const all = groups.join("");
   const chars = groups.map((group) => group[random(group.length)]);
   while (chars.length < length) chars.push(all[random(all.length)]);

@@ -1,17 +1,32 @@
 import type { Tool } from "../types.ts";
 
-export function fromUnix(value: string, multiplier = 1000) {
+export function fromUnix(value: string, multiplier: 1 | 1000 = 1000) {
   const input = value.trim();
-  if (!/^-?\d+$/.test(input))
-    throw new Error("Enter a whole-number Unix timestamp.");
-  const number = Number(input);
-  const date = new Date(number * multiplier);
-  if (!Number.isSafeInteger(number) || !Number.isFinite(date.getTime()))
+  const valid =
+    multiplier === 1000
+      ? /^-?\d+(?:\.\d{1,3})?$/.test(input)
+      : /^-?\d+$/.test(input);
+  if (!valid)
+    throw new Error(
+      multiplier === 1000
+        ? "Enter Unix seconds with up to three decimal places."
+        : "Enter whole-number Unix milliseconds.",
+    );
+  const negative = input.startsWith("-");
+  const [wholeText, fraction = ""] = input.replace(/^-/, "").split(".");
+  const whole = wholeText.replace(/^0+(?=\d)/, "");
+  if (whole.length > 16)
     throw new Error("Timestamp is outside the supported date range.");
-  return date.toISOString();
+  const milliseconds =
+    (multiplier === 1000
+      ? BigInt(whole) * 1000n + BigInt(fraction.padEnd(3, "0"))
+      : BigInt(whole)) * (negative ? -1n : 1n);
+  if (milliseconds < -8640000000000000n || milliseconds > 8640000000000000n)
+    throw new Error("Timestamp is outside the supported date range.");
+  return new Date(Number(milliseconds)).toISOString();
 }
 
-export function toUnix(value: string) {
+function isoMilliseconds(value: string) {
   const input = value.trim();
   const parts =
     /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,3}))?)?(Z|[+-](\d{2}):(\d{2}))$/.exec(
@@ -68,7 +83,14 @@ export function toUnix(value: string) {
     throw new Error("Enter a valid calendar date and time.");
   const date = Date.parse(input);
   if (!Number.isFinite(date)) throw new Error("Enter a valid ISO date.");
-  return String(Math.floor(date / 1000));
+  return date;
+}
+
+export function toUnix(value: string) {
+  return String(Math.floor(isoMilliseconds(value) / 1000));
+}
+export function toMilliseconds(value: string) {
+  return String(isoMilliseconds(value));
 }
 
 export const timestampTool: Tool = {
@@ -83,5 +105,6 @@ export const timestampTool: Tool = {
     { label: "Seconds → UTC", run: fromUnix },
     { label: "Milliseconds → UTC", run: (value) => fromUnix(value, 1) },
     { label: "ISO date → Unix", run: toUnix },
+    { label: "ISO date → milliseconds", run: toMilliseconds },
   ],
 };

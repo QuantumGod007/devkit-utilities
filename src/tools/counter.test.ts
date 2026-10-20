@@ -14,3 +14,12 @@ test("counts composed accents and emoji sequences as visible characters", () => 
   assert.equal(result.codePoints, 9);
   assert.equal(JSON.parse(count("one\r\ntwo")).lines, 2);
 });
+
+test("estimates reading time at 200 words per minute, with an empty state", () => {
+  assert.equal(JSON.parse(count("")).readingTimeSeconds, 0);
+  assert.equal(
+    JSON.parse(count(Array(200).fill("word").join(" "))).readingTimeSeconds,
+    60,
+  );
+  assert.equal(JSON.parse(count("hello")).readingTimeSeconds, 1);
+});

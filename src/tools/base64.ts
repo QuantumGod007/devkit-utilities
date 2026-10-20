@@ -1,3 +1,28 @@
-import type { Tool } from '../types.ts';
-export function encode(value:string){return btoa(Array.from(new TextEncoder().encode(value),byte=>String.fromCharCode(byte)).join(''))} export function decode(value:string){try {return new TextDecoder('utf-8',{fatal:true}).decode(Uint8Array.from(atob(value),char=>char.charCodeAt(0)))}catch{throw new Error('Enter valid Base64 containing UTF-8 text.')}}
-export const base64Tool:Tool={id:"base64",name:"Base64 codec",category:"Encoding",description:"Encode Unicode text as Base64 or decode UTF-8 Base64.",sample:"Hello, \u4e16\u754c \ud83d\udc4b",actions:[{label:"Encode",run:encode},{label:"Decode",run:decode}]};
+import type { Tool } from "../types.ts";
+export function encode(value: string) {
+  return btoa(
+    Array.from(new TextEncoder().encode(value), (byte) =>
+      String.fromCharCode(byte),
+    ).join(""),
+  );
+}
+export function decode(value: string) {
+  try {
+    return new TextDecoder("utf-8", { fatal: true }).decode(
+      Uint8Array.from(atob(value), (char) => char.charCodeAt(0)),
+    );
+  } catch {
+    throw new Error("Enter valid Base64 containing UTF-8 text.");
+  }
+}
+export const base64Tool: Tool = {
+  id: "base64",
+  name: "Base64 codec",
+  category: "Encoding",
+  description: "Encode Unicode text as Base64 or decode UTF-8 Base64.",
+  sample: "Hello, \u4e16\u754c \ud83d\udc4b",
+  actions: [
+    { label: "Encode", run: encode },
+    { label: "Decode", run: decode },
+  ],
+};
