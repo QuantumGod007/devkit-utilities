@@ -163,7 +163,12 @@ test("clipboard success and permission failures give usable feedback", async ({
   await expect(page.getByRole("status")).toHaveText("Copied to clipboard.");
   expect(
     await page.evaluate(() => (window as unknown as { copied: string }).copied),
-  ).toContain('"hello"');
+  ).toBe(
+    await page
+      .getByRole("region", { name: "JSON formatter", exact: true })
+      .getByLabel("Output", { exact: true })
+      .inputValue(),
+  );
   await page.evaluate(() => {
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -249,6 +254,8 @@ for (const width of [320, 390, 768, 1440]) {
       "URL codec",
       "Text case",
       "Text inspector",
+      "Color converter",
+      "Markdown preview",
     ]) {
       await page.getByRole("button", { name: tool, exact: true }).click();
       await expect(
