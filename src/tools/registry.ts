@@ -1,2 +1,3 @@
 import type { Tool } from '../types';
-export const tools: Tool[] = [];
+import { jsonTool } from './json.ts';
+export const tools:Tool[]=[jsonTool];
