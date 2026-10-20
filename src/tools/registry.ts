@@ -4,4 +4,5 @@ import { base64Tool } from './base64.ts';
 import { passwordTool } from './password.ts';
 import { uuidTool } from './uuid.ts';
 import { timestampTool } from './timestamp.ts';
-export const tools:Tool[]=[jsonTool,base64Tool,passwordTool,uuidTool,timestampTool];
+import { urlTool } from './url.ts';
+export const tools:Tool[]=[jsonTool,base64Tool,passwordTool,uuidTool,timestampTool,urlTool];
